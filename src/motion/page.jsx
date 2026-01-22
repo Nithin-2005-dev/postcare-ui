@@ -7,11 +7,15 @@ export default function Page({ children }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -12 }}
       transition={{
-        duration: 0.5,
-        ease: [0.22, 1, 0.36, 1],
+        duration: 0.4,
+        ease: "easeOut",
       }}
+      className="min-h-screen w-full overflow-x-hidden bg-black text-white"
     >
-      {children}
+      {/* App container */}
+      <div className="mx-auto w-full max-w-md px-4 pb-20">
+        {children}
+      </div>
     </motion.div>
   );
 }
