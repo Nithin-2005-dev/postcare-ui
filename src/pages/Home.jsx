@@ -19,7 +19,7 @@ import {
   symptomTrends,
 } from "../data/mockDashboardData";
 
-/* ================= DESIGN SYSTEM ================= */
+/* ================= ANIMATION ================= */
 
 const EASE = [0.22, 1, 0.36, 1];
 
@@ -39,7 +39,7 @@ const stagger = {
   },
 };
 
-/* ================= 3D CORE (DESKTOP ONLY) ================= */
+/* ================= 3D CORE ================= */
 
 function HealthCore() {
   const ref = useRef(null);
@@ -69,7 +69,8 @@ function HealthCore() {
 /* ================= PAGE ================= */
 
 export default function Home() {
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 640;
+  const isMobile =
+    typeof window !== "undefined" && window.innerWidth < 640;
 
   function getGreeting() {
     const hour = new Date().getHours();
@@ -82,7 +83,14 @@ export default function Home() {
   return (
     <Page>
       <div className="relative min-h-screen bg-black text-white overflow-x-hidden">
-        <div className="absolute inset-0 bg-linear-to-br from-blue-900/20 via-black to-black pointer-events-none" />
+        {/* BACKGROUND */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(to bottom right, rgba(30,58,138,0.2), #000, #000)",
+          }}
+        />
 
         <motion.div
           variants={stagger}
@@ -93,15 +101,12 @@ export default function Home() {
           {/* ================= HERO ================= */}
           <motion.section
             variants={fadeUp}
-            className="
-              relative overflow-hidden
-              min-h-80 sm:min-h-130 lg:min-h-162.5
-              rounded-4xl sm:rounded-[4rem]
-              bg-neutral-900/50 border border-white/10
-              flex flex-col justify-end
-            "
+            className="hero-section relative overflow-hidden bg-neutral-900/50 border border-white/10 rounded-3xl flex flex-col justify-end"
+            style={{
+              minHeight: isMobile ? "320px" : "600px",
+            }}
           >
-            {/* Desktop 3D */}
+            {/* Desktop Canvas */}
             <div className="absolute inset-0 hidden sm:block pointer-events-none">
               <Canvas camera={{ position: [0, 0, 5] }} dpr={[1, 2]}>
                 <ambientLight intensity={0.6} />
@@ -111,20 +116,29 @@ export default function Home() {
               </Canvas>
             </div>
 
-            {/* Mobile visual */}
+            {/* Mobile fallback */}
             <div className="absolute inset-0 flex sm:hidden items-center justify-center pointer-events-none">
               <div className="w-52 h-52 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
             </div>
 
-            <div className="relative z-10 p-6 sm:p-14 lg:p-20 bg-linear-to-t from-black via-black/40 to-transparent">
+            <div
+              className="relative z-10 p-6 sm:p-14"
+              style={{
+                background:
+                  "linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0.6), rgba(0,0,0,0))",
+              }}
+            >
               <div className="flex items-center gap-2 mb-4">
                 <ShieldCheck size={14} className="text-blue-400" />
-                <p className="text-[10px] sm:text-xs font-bold tracking-[0.2em] uppercase text-blue-400">
+                <p
+                  className="text-xs font-bold uppercase text-blue-400"
+                  style={{ letterSpacing: "0.2em" }}
+                >
                   {getGreeting()}, {patientProfile.name}
                 </p>
               </div>
 
-              <h1 className="font-bold leading-tight tracking-tight text-3xl sm:text-5xl lg:text-7xl">
+              <h1 className="font-bold tracking-tight leading-tight text-3xl sm:text-5xl lg:text-7xl">
                 Recovery day {recoveryOverview.currentDay}
                 <span className="block font-light text-neutral-400">
                   of {recoveryOverview.expectedRecoveryDays}
@@ -163,14 +177,14 @@ export default function Home() {
 
           {/* ================= MEDICATIONS ================= */}
           <Section title="Active Medications">
-            <div className="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-6 scrollbar-hide">
+            <div className="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-6">
               {medications.map((med) => (
                 <Card
                   key={med.id}
-                  className="min-w-70 sm:min-w-85 snap-center shrink-0"
+                  className="med-card min-w-70 sm:min-w-85 snap-center shrink-0"
                 >
                   <h3 className="text-lg font-bold">{med.name}</h3>
-                  <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest mb-6">
+                  <p className="text-xs text-blue-400 font-bold uppercase tracking-widest mb-6">
                     {med.category}
                   </p>
 
@@ -178,7 +192,7 @@ export default function Home() {
                     <Row label="Dosage" value={med.dosage} />
                     <Row label="Frequency" value={med.frequency} />
                     <div className="pt-4 border-t border-white/10">
-                      <p className="text-[10px] uppercase text-neutral-500 font-bold">
+                      <p className="text-xs uppercase text-neutral-500 font-bold">
                         Inventory
                       </p>
                       <p className="text-lg font-bold">
@@ -198,12 +212,12 @@ export default function Home() {
                 <Card key={symptom}>
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="font-bold capitalize">{symptom}</h3>
-                    <span className="text-[10px] px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold">
+                    <span className="text-xs px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold">
                       Live
                     </span>
                   </div>
 
-                  <div className="h-40">
+                  <div className="chart-container h-40">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart
                         data={values.map((v, i) => ({ day: i + 1, v }))}
@@ -232,12 +246,42 @@ export default function Home() {
             </MotionGrid>
           </Section>
         </motion.div>
+
+        {/* ================= RESPONSIVE FIXES ================= */}
+        <style>
+          {`
+            @media (max-width: 640px) {
+              .hero-section {
+                min-height: 320px !important;
+              }
+
+              .med-card {
+                min-width: 75vw !important;
+              }
+
+              .chart-container {
+                height: 160px !important;
+              }
+
+              .wrap-break-word {
+                word-break: break-word;
+                overflow-wrap: break-word;
+              }
+            }
+
+            @media (min-width: 641px) and (max-width: 1024px) {
+              .med-card {
+                min-width: 320px !important;
+              }
+            }
+          `}
+        </style>
       </div>
     </Page>
   );
 }
 
-/* ================= REUSABLE UI ================= */
+/* ================= UI HELPERS ================= */
 
 function Section({ title, children }) {
   return (
@@ -268,12 +312,9 @@ function Card({ children, className = "", glass = false }) {
   return (
     <motion.div
       variants={fadeUp}
-      className={`
-        rounded-[2rem] p-6 sm:p-10 border border-white/10
-        ${glass ? "bg-black/40 backdrop-blur-2xl" : "bg-neutral-900/60"}
-        hover:border-blue-500/40 transition-all duration-300
-        ${className}
-      `}
+      className={`rounded-3xl p-6 sm:p-10 border border-white/10 ${
+        glass ? "bg-black/40 backdrop-blur-xl" : "bg-neutral-900/60"
+      } hover:border-blue-500/40 transition ${className}`}
     >
       {children}
     </motion.div>
@@ -285,12 +326,12 @@ function Stat({ label, value, icon: Icon, accent }) {
     <div>
       <div className="flex items-center gap-2 mb-1">
         {Icon && <Icon size={12} className="text-neutral-500" />}
-        <p className="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">
+        <p className="text-xs uppercase tracking-widest text-neutral-500 font-bold">
           {label}
         </p>
       </div>
       <p
-        className={`text-base sm:text-2xl font-bold break-words ${
+        className={`text-base sm:text-2xl font-bold wrap-break-word ${
           accent ? "text-emerald-400" : "text-white"
         }`}
       >
@@ -302,7 +343,7 @@ function Stat({ label, value, icon: Icon, accent }) {
 
 function Tag({ children }) {
   return (
-    <span className="inline-block text-[10px] px-4 py-1.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold uppercase">
+    <span className="inline-block text-xs px-4 py-1.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold uppercase">
       {children}
     </span>
   );
