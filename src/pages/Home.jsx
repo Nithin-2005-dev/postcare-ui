@@ -1,10 +1,6 @@
 import { motion } from "framer-motion";
 import { Canvas, useFrame } from "@react-three/fiber";
-import {
-  Float,
-  MeshDistortMaterial,
-  Stars,
-} from "@react-three/drei";
+import { Float, MeshDistortMaterial, Stars } from "@react-three/drei";
 import {
   ResponsiveContainer,
   LineChart,
@@ -26,27 +22,27 @@ import {
   symptomTrends,
 } from "../data/mockDashboardData";
 
-/* ================= DESIGN SYSTEM ================= */
+/* ================= MOTION ================= */
 
 const EASE = [0.22, 1, 0.36, 1];
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, ease: EASE },
+    transition: { duration: 0.7, ease: EASE },
   },
 };
 
 const stagger = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.1, delayChildren: 0.12 },
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
   },
 };
 
-/* ================= 3D CORE ================= */
+/* ================= 3D CORE (DESKTOP ONLY) ================= */
 
 function HealthCore() {
   const ref = useRef();
@@ -58,15 +54,14 @@ function HealthCore() {
   });
 
   return (
-    <Float speed={1.1} floatIntensity={1.2}>
+    <Float speed={1} floatIntensity={1.2}>
       <mesh ref={ref}>
-        <sphereGeometry args={[1.7, 96, 96]} />
+        <sphereGeometry args={[1.5, 80, 80]} />
         <MeshDistortMaterial
           color="#3B82F6"
-          distort={0.25}
-          speed={1.6}
+          distort={0.22}
+          speed={1.4}
           roughness={0.35}
-          metalness={0.2}
         />
       </mesh>
     </Float>
@@ -82,34 +77,31 @@ export default function Home() {
         variants={stagger}
         initial="hidden"
         animate="visible"
-        className="space-y-1.5"
+        className="space-y-20 md:space-y-28"
       >
-        {/* ======================================================
-           HERO — INTELLIGENCE CORE
-        ====================================================== */}
+        {/* ================= HERO ================= */}
         <motion.section
           variants={fadeUp}
-          className="relative overflow-hidden rounded-[48px]
-          bg-linear-to-br from-neutral-900 via-neutral-900/90 to-black
+          className="relative overflow-hidden rounded-3xl md:rounded-[48px]
+          bg-gradient-to-br from-neutral-900 via-neutral-900/90 to-black
           border border-white/10"
         >
-          {/* 3D ATMOSPHERE */}
-          <div className="absolute inset-0">
+          {/* 3D ONLY ON DESKTOP */}
+          <div className="absolute inset-0 hidden md:block">
             <Canvas camera={{ position: [0, 0, 5] }}>
-              <ambientLight intensity={0.7} />
+              <ambientLight intensity={0.6} />
               <directionalLight position={[6, 6, 6]} />
-              <Stars radius={60} depth={40} count={500} factor={2} fade />
+              <Stars radius={50} depth={40} count={400} factor={2} fade />
               <HealthCore />
             </Canvas>
           </div>
 
-          {/* CONTENT */}
-          <div className="relative z-10 p-14 md:p-20">
+          <div className="relative z-10 px-6 py-10 md:px-16 md:py-20">
             <p className="text-sm text-neutral-400">
               Good afternoon, {patientProfile.name}
             </p>
 
-            <h1 className="mt-4 text-5xl font-semibold leading-tight">
+            <h1 className="mt-3 text-3xl md:text-5xl font-semibold leading-tight">
               Recovery day {recoveryOverview.currentDay}
               <span className="text-neutral-400 font-normal">
                 {" "}
@@ -117,7 +109,7 @@ export default function Home() {
               </span>
             </h1>
 
-            <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-12">
+            <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12">
               <Stat label="Status" value="Recovering normally" accent />
               <Stat
                 label="Confidence"
@@ -129,183 +121,135 @@ export default function Home() {
           </div>
         </motion.section>
 
-        {/* ======================================================
-           SPOTLIGHT — STORY MOMENT
-        ====================================================== */}
+        {/* ================= SPOTLIGHT ================= */}
         <motion.section
           variants={fadeUp}
-          className="relative rounded-[36px] p-14
-          bg-linear-to-r from-blue-600/20 via-cyan-500/10 to-transparent
+          className="rounded-3xl md:rounded-[36px]
+          px-6 py-10 md:px-14 md:py-14
+          bg-gradient-to-r from-blue-600/20 via-cyan-500/10 to-transparent
           border border-white/10"
         >
-          <p className="text-xs uppercase tracking-widest text-blue-400 mb-4">
+          <p className="text-xs uppercase tracking-widest text-blue-400 mb-3">
             Recovery spotlight
           </p>
 
-          <h2 className="text-4xl font-semibold mb-6">
+          <h2 className="text-2xl md:text-4xl font-semibold mb-4">
             You are recovering faster than average
           </h2>
 
-          <p className="text-lg text-neutral-300 max-w-3xl">
-            Based on patients with similar conditions, your symptom
-            trends indicate a smoother-than-expected recovery curve.
+          <p className="text-sm md:text-lg text-neutral-300 max-w-3xl">
+            Based on similar patients, your symptom trends indicate
+            a smoother-than-expected recovery curve.
           </p>
 
-          <div className="mt-10 flex gap-16">
+          <div className="mt-8 flex gap-10">
             <Stat label="Avg recovery time" value="14 days" />
             <Stat label="Your projection" value="11 days" accent />
           </div>
         </motion.section>
 
-        {/* ======================================================
-           DAILY INSIGHTS
-        ====================================================== */}
+        {/* ================= INSIGHTS ================= */}
         <Section title="Today’s insights">
-          <MotionGrid cols="md:grid-cols-2 xl:grid-cols-3">
+          <Grid>
             {dailyInsights.map((item) => (
               <Card key={item.id}>
                 <Tag>{item.type}</Tag>
-                <h3 className="mt-5 text-xl font-medium">
-                  {item.title}
-                </h3>
-                <p className="mt-3 text-sm text-neutral-400">
+                <h3 className="mt-4 text-lg font-medium">{item.title}</h3>
+                <p className="mt-2 text-sm text-neutral-400">
                   {item.description}
                 </p>
               </Card>
             ))}
-          </MotionGrid>
+          </Grid>
         </Section>
 
-        {/* ======================================================
-           MEDICATIONS
-        ====================================================== */}
+        {/* ================= MEDICATIONS ================= */}
         <Section title="Medications">
-          <motion.div
-            variants={stagger}
-            className="flex gap-8 overflow-x-auto snap-x snap-mandatory pb-6"
-          >
+          <div className="flex gap-5 overflow-x-auto pb-4">
             {medications.map((med) => (
-              <Card key={med.id} className="min-w-85 snap-start">
-                <h3 className="text-xl font-medium">{med.name}</h3>
+              <Card key={med.id} className="min-w-[280px]">
+                <h3 className="font-medium">{med.name}</h3>
                 <p className="text-sm text-neutral-400">{med.category}</p>
-
-                <div className="mt-6 space-y-2 text-sm">
+                <div className="mt-4 space-y-1 text-sm">
                   <Row label="Dosage" value={med.dosage} />
                   <Row label="Frequency" value={med.frequency} />
-                  <Row
-                    label="Remaining"
-                    value={`${med.daysRemaining} days`}
-                  />
+                  <Row label="Remaining" value={`${med.daysRemaining} days`} />
                 </div>
               </Card>
             ))}
-          </motion.div>
+          </div>
         </Section>
 
-        {/* ======================================================
-           RISK SIGNALS
-        ====================================================== */}
-        <Section title="Risk signals">
-          <MotionGrid cols="md:grid-cols-2">
-            {riskSignals.map((risk) => (
-              <Card key={risk.id}>
-                <Tag>{risk.level}</Tag>
-                <h3 className="mt-5 text-xl font-medium">
-                  {risk.title}
-                </h3>
-                <p className="mt-3 text-sm text-neutral-400">
-                  {risk.description}
-                </p>
-              </Card>
-            ))}
-          </MotionGrid>
-        </Section>
-
-        {/* ======================================================
-           SYMPTOM TRENDS
-        ====================================================== */}
+        {/* ================= SYMPTOMS ================= */}
         <Section title="Symptom trends">
-          <MotionGrid cols="md:grid-cols-2 xl:grid-cols-3">
+          <Grid>
             {Object.entries(symptomTrends).map(([symptom, values]) => (
               <Card key={symptom}>
-                <h3 className="font-medium mb-5">{symptom}</h3>
-
-                <div className="relative h-44">
-                  <div className="absolute inset-0 bg-blue-500/10 blur-2xl rounded-full" />
-                  <ResponsiveContainer width="100%" height="100%">
+                <h3 className="font-medium mb-3">{symptom}</h3>
+                <div className="h-40">
+                  <ResponsiveContainer>
                     <LineChart
                       data={values.map((v, i) => ({
-                        day: `Day ${i + 1}`,
+                        day: i + 1,
                         severity: v,
                       }))}
                     >
-                      <XAxis stroke="#6B7280" fontSize={12} dataKey="day" />
-                      <YAxis stroke="#6B7280" fontSize={12} domain={[0, 5]} />
-                      <Tooltip
-                        contentStyle={{
-                          background: "#0B0F14",
-                          border: "1px solid #1F2937",
-                          borderRadius: 12,
-                        }}
-                      />
+                      <XAxis hide />
+                      <YAxis hide domain={[0, 5]} />
+                      <Tooltip />
                       <Line
                         type="monotone"
                         dataKey="severity"
                         stroke="#3B82F6"
-                        strokeWidth={2.5}
+                        strokeWidth={2}
                         dot={false}
-                        animationDuration={1400}
                       />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
               </Card>
             ))}
-          </MotionGrid>
+          </Grid>
         </Section>
 
-        {/* ======================================================
-           EDUCATION
-        ====================================================== */}
+        {/* ================= EDUCATION ================= */}
         <Section title="For you">
-          <MotionGrid cols="md:grid-cols-2 xl:grid-cols-3">
+          <Grid>
             {educationalFeed.map((item) => (
               <Card key={item.id}>
                 <Tag>{item.category}</Tag>
-                <h3 className="mt-5 text-xl font-medium">
-                  {item.title}
-                </h3>
-                <p className="mt-4 text-xs text-neutral-500">
+                <h3 className="mt-4 font-medium">{item.title}</h3>
+                <p className="mt-2 text-xs text-neutral-500">
                   {item.readTime} read
                 </p>
               </Card>
             ))}
-          </MotionGrid>
+          </Grid>
         </Section>
       </motion.div>
     </Page>
   );
 }
 
-/* ================= BUILDING BLOCKS ================= */
+/* ================= UI PRIMITIVES ================= */
 
 function Section({ title, children }) {
   return (
     <section>
-      <h2 className="text-2xl font-semibold mb-8">{title}</h2>
+      <h2 className="text-xl md:text-2xl font-semibold mb-6">{title}</h2>
       {children}
     </section>
   );
 }
 
-function MotionGrid({ cols, children }) {
+function Grid({ children }) {
   return (
     <motion.div
       variants={stagger}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: "-140px" }}
-      className={`grid grid-cols-1 ${cols} gap-8`}
+      viewport={{ once: true }}
+      className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
     >
       {children}
     </motion.div>
@@ -316,14 +260,9 @@ function Card({ children, className = "" }) {
   return (
     <motion.div
       variants={fadeUp}
-      whileHover={{ y: -12 }}
-      transition={{ duration: 0.3 }}
-      className={`relative overflow-hidden rounded-3xl
-      bg-linear-to-br from-neutral-900 via-neutral-900 to-neutral-950
-      border border-white/10 p-10 ${className}`}
+      whileHover={{ y: -8 }}
+      className={`rounded-2xl bg-neutral-900 border border-white/10 p-6 ${className}`}
     >
-      <div className="absolute inset-0 pointer-events-none
-      bg-linear-to-tr from-white/5 via-transparent to-transparent" />
       {children}
     </motion.div>
   );
@@ -333,11 +272,7 @@ function Stat({ label, value, accent }) {
   return (
     <div>
       <p className="text-xs text-neutral-400">{label}</p>
-      <p
-        className={`text-2xl font-medium ${
-          accent ? "text-emerald-400" : ""
-        }`}
-      >
+      <p className={`text-lg font-medium ${accent ? "text-emerald-400" : ""}`}>
         {value}
       </p>
     </div>
@@ -346,8 +281,7 @@ function Stat({ label, value, accent }) {
 
 function Tag({ children }) {
   return (
-    <span className="inline-block text-xs px-2 py-1 rounded-full
-    bg-neutral-800 text-neutral-300">
+    <span className="inline-block text-xs px-2 py-1 rounded-full bg-neutral-800">
       {String(children).toUpperCase()}
     </span>
   );
